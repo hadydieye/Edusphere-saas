@@ -7,6 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Separator } from "@/components/ui/separator";
 import { classes, eleves, matieres, ecole } from "@/lib/data";
 import { Download, GraduationCap, FileText } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function BulletinsPage() {
   const [classeId, setClasseId] = useState(classes[0].id);
@@ -16,7 +18,6 @@ export default function BulletinsPage() {
   const selectedEleve = eleves.find((e) => e.id === eleveId);
   const selectedClasse = classes.find((c) => c.id === classeId);
 
-  // Calculate weighted average and rank
   const getWeightedAverage = (notes: Record<string, number>) => {
     let totalWeighted = 0;
     let totalCoeff = 0;
@@ -33,6 +34,76 @@ export default function BulletinsPage() {
     .sort((a, b) => b.avg - a.avg);
 
   const eleveRank = rankings.findIndex((r) => r.id === eleveId) + 1;
+
+  const handleDownloadPDF = () => {
+    if (!selectedEleve || !selectedClasse) return;
+
+    const doc = new jsPDF();
+    const avg = getWeightedAverage(selectedEleve.notes);
+
+    // Header
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text(ecole.nom, 105, 20, { align: "center" });
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text(`${ecole.ville}, ${ecole.pays}`, 105, 28, { align: "center" });
+
+    doc.setDrawColor(26, 82, 118);
+    doc.setLineWidth(0.5);
+    doc.line(20, 33, 190, 33);
+
+    doc.setFontSize(14);
+    doc.setFont("helvetica", "bold");
+    doc.text("BULLETIN DE NOTES", 105, 42, { align: "center" });
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.text("Trimestre 1 — Année scolaire 2024-2025", 105, 48, { align: "center" });
+
+    // Student info
+    doc.setFillColor(244, 246, 249);
+    doc.roundedRect(20, 55, 170, 18, 3, 3, "F");
+    doc.setFontSize(10);
+    doc.text(`Élève : ${selectedEleve.prenom} ${selectedEleve.nom}`, 25, 64);
+    doc.text(`Classe : ${selectedClasse.nom}`, 120, 64);
+
+    // Grades table
+    const tableData = matieres.map((m) => {
+      const note = selectedEleve.notes[m.id] ?? 0;
+      return [m.nom, note.toString(), m.coefficient.toString(), (note * m.coefficient).toFixed(1)];
+    });
+
+    autoTable(doc, {
+      startY: 80,
+      head: [["Matière", "Note / 20", "Coeff.", "Note pondérée"]],
+      body: tableData,
+      theme: "grid",
+      headStyles: { fillColor: [26, 82, 118], textColor: 255, fontStyle: "bold" },
+      styles: { fontSize: 10, cellPadding: 4 },
+      columnStyles: {
+        1: { halign: "center" },
+        2: { halign: "center" },
+        3: { halign: "center" },
+      },
+    });
+
+    const finalY = (doc as any).lastAutoTable?.finalY ?? 140;
+
+    doc.setDrawColor(26, 82, 118);
+    doc.line(20, finalY + 5, 190, finalY + 5);
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text(`Moyenne générale pondérée : ${avg.toFixed(2)} / 20`, 25, finalY + 15);
+    doc.text(`Rang : ${eleveRank}e / ${classEleves.length}`, 145, finalY + 15);
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "italic");
+    doc.text("Généré par Edusphère — La gestion scolaire numérique pour la Guinée", 105, 285, { align: "center" });
+
+    doc.save(`bulletin_${selectedEleve.prenom}_${selectedEleve.nom}.pdf`);
+  };
 
   return (
     <div className="space-y-6">
@@ -69,7 +140,6 @@ export default function BulletinsPage() {
       {selectedEleve && (
         <Card className="shadow-elevated max-w-2xl" id="bulletin">
           <CardContent className="p-8">
-            {/* Header */}
             <div className="text-center mb-6">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <GraduationCap className="h-8 w-8 text-primary" />
@@ -81,7 +151,6 @@ export default function BulletinsPage() {
               <p className="text-sm text-muted-foreground">Trimestre 1 — Année scolaire 2024-2025</p>
             </div>
 
-            {/* Student Info */}
             <div className="bg-muted rounded-lg p-4 mb-6">
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
@@ -95,7 +164,6 @@ export default function BulletinsPage() {
               </div>
             </div>
 
-            {/* Grades Table */}
             <Table>
               <TableHeader>
                 <TableRow>
@@ -122,7 +190,6 @@ export default function BulletinsPage() {
 
             <Separator className="my-4" />
 
-            {/* Summary */}
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-sm text-muted-foreground">Moyenne générale pondérée</p>
@@ -139,7 +206,7 @@ export default function BulletinsPage() {
             </div>
 
             <div className="mt-6 flex justify-end">
-              <Button onClick={() => window.print()}>
+              <Button onClick={handleDownloadPDF}>
                 <Download className="h-4 w-4 mr-2" />
                 Télécharger PDF
               </Button>
