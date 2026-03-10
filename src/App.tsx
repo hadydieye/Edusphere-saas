@@ -11,6 +11,9 @@ import ClassesPage from "./pages/dashboard/ClassesPage";
 import ElevesPage from "./pages/dashboard/ElevesPage";
 import NotesPage from "./pages/dashboard/NotesPage";
 import BulletinsPage from "./pages/dashboard/BulletinsPage";
+import MatieresPage from "./pages/dashboard/MatieresPage";
+import ProfesseursPage from "./pages/dashboard/ProfesseursPage";
+import ParametresPage from "./pages/dashboard/ParametresPage";
 import ParentPage from "./pages/ParentPage";
 import NotFound from "./pages/NotFound";
 
