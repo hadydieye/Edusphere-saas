@@ -1,73 +1,67 @@
-# Welcome to your Lovable project
+# Edusphère 🎓
 
-## Project info
+**La gestion scolaire numérique pour la Guinée**
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Edusphère est une plateforme SaaS de gestion scolaire conçue spécifiquement pour les établissements guinéens. Interface entièrement en français.
 
-## How can I edit this code?
+## Fonctionnalités
 
-There are several ways of editing your application.
+- 🏫 **Gestion des classes** — Création, organisation et suivi des classes par niveau
+- 👨‍🎓 **Gestion des élèves** — Fiches élèves, recherche, profils avec notes par matière
+- 📝 **Saisie des notes** — Interface professeur avec calcul automatique des moyennes
+- 📄 **Bulletins** — Génération de bulletins avec moyennes pondérées et classement
+- 👪 **Espace parent** — Vue mobile responsive pour consulter notes et bulletins
+- 🔐 **Authentification** — Connexion par rôle (admin, professeur, parent)
 
-**Use Lovable**
+## Stack technique
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+- **Frontend** : React 18 + TypeScript + Vite
+- **UI** : Tailwind CSS + shadcn/ui
+- **Animations** : Framer Motion
+- **Routing** : React Router DOM
 
-Changes made via Lovable will be committed automatically to this repo.
+## Palette de couleurs
 
-**Use your preferred IDE**
+| Rôle        | Couleur   |
+|-------------|-----------|
+| Primary     | `#1A5276` |
+| Secondary   | `#2980B9` |
+| Background  | `#F4F6F9` |
+| Text        | `#2C3E50` |
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Lancer le projet
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Cloner le dépôt
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Installer les dépendances
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Démarrer le serveur de développement
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Structure des pages
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+| Page | Route | Description |
+|------|-------|-------------|
+| Landing | `/` | Page d'accueil publique |
+| Connexion | `/login` | Authentification |
+| Tableau de bord | `/dashboard` | Vue admin principale |
+| Classes | `/dashboard/classes` | Gestion des classes |
+| Élèves | `/dashboard/eleves` | Gestion des élèves |
+| Notes | `/dashboard/notes` | Saisie des notes (professeur) |
+| Bulletins | `/dashboard/bulletins` | Génération de bulletins |
+| Espace parent | `/parent` | Vue mobile parent |
 
-**Use GitHub Codespaces**
+## Tarification (GNF/an)
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Starter** : 500 000 GNF — jusqu'à 200 élèves
+- **Pro** : 1 000 000 GNF — jusqu'à 1 000 élèves
+- **Enterprise** : 2 000 000 GNF — illimité
 
-## What technologies are used for this project?
+## Licence
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Projet privé — Tous droits réservés.
