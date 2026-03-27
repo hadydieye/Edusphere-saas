@@ -17,6 +17,9 @@ export async function signIn(email: string, password: string): Promise<string | 
     return 'Accès non autorisé.';
   }
 
+  redirect('/super-admin');
+}
+
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
