@@ -22,7 +22,7 @@ export default function PaymentsPage() {
   const load = useCallback(async (p: number) => {
     setIsLoading(true);
     const res = await getPayments({ page: p });
-    setPayments(res.payments as Payment[]);
+    setPayments(res.payments as unknown as Payment[]);
     setTotal(res.total);
     setIsLoading(false);
   }, []);
