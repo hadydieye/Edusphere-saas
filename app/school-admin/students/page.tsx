@@ -16,7 +16,7 @@ export default function StudentsPage() {
   const load = useCallback(async (p: number, q: string) => {
     setIsLoading(true);
     const res = await getStudents({ page: p, search: q });
-    setStudents(res.students as Student[]);
+    setStudents(res.students as unknown as Student[]);
     setTotal(res.total);
     setIsLoading(false);
   }, []);
