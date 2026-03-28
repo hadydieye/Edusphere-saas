@@ -21,8 +21,8 @@ INSTRUCTIONS FOR THE USER:
 -- REPLACE 'YOUR_USER_ID' with the actual UUID from Supabase Auth
 DO $$
 DECLARE
-    target_user_id UUID := 'YOUR_USER_ID'; -- <--- CHANGE THIS
-    target_email TEXT := 'YOUR_EMAIL'; -- <--- CHANGE THIS
+    target_user_id UUID := 'b01170fe-4bad-4052-a80f-648290adad9b'; -- <--- CHANGE THIS
+    target_email TEXT := 'scriptseinseidieye@gmail.com'; -- <--- CHANGE THIS
 BEGIN
     -- Link to school_admins table
     INSERT INTO school_admins (school_id, user_id, email)
