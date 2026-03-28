@@ -27,7 +27,16 @@ export interface AuditLog {
 }
 
 interface DashboardPageProps {
-  stats: { total: number; active: number; suspended: number; admins: number };
+  stats: {
+    total: number;
+    active: number;
+    suspended: number;
+    admins: number;
+    students: number;
+    teachers: number;
+    revenue: number;
+    expenses: number;
+  };
   chartData: { date: string; count: number }[];
   recentSchools: School[];
   recentAuditLogs: AuditLog[];
@@ -59,15 +68,28 @@ const IconUsers = () => (
   </svg>
 );
 
+const IconAcademic = () => (
+  <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+    <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.36a11.076 11.076 0 01.25 3.762 1 1 0 01-.89.89 8.976 8.976 0 00-1.75.313V12a1 1 0 10-2 0v4.616a9.48 9.48 0 01-2.992.14z" />
+  </svg>
+);
+
+const IconCurrency = () => (
+  <svg viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+    <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.692C6.604 6.268 6 7.083 6 8c0 .917.604 1.732 1.324 2.216.5.335 1.055.519 1.676.618v1.101a4.535 4.535 0 00-1.676.692c-.72.484-1.324 1.3-1.324 2.216 0 .917.604 1.732 1.324 2.216.5.335 1.055.519 1.676.618V19a1 1 0 102 0v-.092c.621-.099 1.176-.283 1.676-.618.72-.484 1.324-1.3 1.324-2.216 0-.917-.604-1.732-1.324-2.216a4.535 4.535 0 00-1.676-.618v-1.101c.621-.099 1.176-.283 1.676-.618.72-.484 1.324-1.3 1.324-2.216 0-.917-.604-1.732-1.324-2.216a4.535 4.535 0 00-1.676-.618V5z" clipRule="evenodd" />
+  </svg>
+);
+
 // ─── Stat Card ────────────────────────────────────────────────────────────────
 
 interface StatCardProps {
   label: string;
-  value: number;
+  value: string | number;
   icon: React.ReactNode;
   color: string;       // tailwind text class
   glow: string;        // tailwind shadow class
-  trend?: number;
+  trend?: string;
 }
 
 function StatCard({ label, value, icon, color, glow, trend }: StatCardProps) {
@@ -77,11 +99,13 @@ function StatCard({ label, value, icon, color, glow, trend }: StatCardProps) {
         <span className="font-body text-sm text-muted">{label}</span>
         <span className={color}>{icon}</span>
       </div>
-      <div className="flex items-end gap-2">
-        <span className="font-display text-3xl font-bold text-text">{value.toLocaleString('fr-FR')}</span>
-        {trend !== undefined && (
-          <span className={`font-body text-xs mb-1 ${trend >= 0 ? 'text-success' : 'text-danger'}`}>
-            {trend >= 0 ? '+' : ''}{trend} ce mois
+      <div className="flex flex-col gap-0.5">
+        <span className="font-display text-2xl font-bold text-text truncate">
+          {typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
+        </span>
+        {trend && (
+          <span className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">
+            {trend}
           </span>
         )}
       </div>
@@ -126,17 +150,25 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function DashboardPage({ stats, chartData, recentSchools, recentAuditLogs }: DashboardPageProps) {
+  const formatGNF = (amount: number) => {
+    return new Intl.NumberFormat('fr-GN', { style: 'currency', currency: 'GNF', maximumFractionDigits: 0 }).format(amount);
+  };
+
   const statCards: StatCardProps[] = [
-    { label: 'Total Écoles',     value: stats.total,     icon: <IconBuilding />,    color: 'text-text',    glow: 'hover:shadow-primary/10',  trend: undefined },
-    { label: 'Écoles Actives',   value: stats.active,    icon: <IconCheckCircle />, color: 'text-success', glow: 'hover:shadow-success/10',  trend: 3 },
-    { label: 'Suspendues',       value: stats.suspended, icon: <IconBan />,         color: 'text-danger',  glow: 'hover:shadow-danger/10',   trend: -1 },
-    { label: 'Administrateurs',  value: stats.admins,    icon: <IconUsers />,       color: 'text-accent',  glow: 'hover:shadow-accent/10',   trend: 2 },
+    { label: 'Total Écoles',     value: stats.total,       icon: <IconBuilding />,    color: 'text-text',    glow: 'hover:shadow-primary/10' },
+    { label: 'Écoles Actives',   value: stats.active,      icon: <IconCheckCircle />, color: 'text-success', glow: 'hover:shadow-success/10' },
+    { label: 'Total Élèves',     value: stats.students,    icon: <IconAcademic />,    color: 'text-accent',  glow: 'hover:shadow-accent/10' },
+    { label: 'Enseignants',      value: stats.teachers,    icon: <IconUsers />,       color: 'text-primary', glow: 'hover:shadow-primary/5' },
+    { label: 'Chiffre d\'Affaire', value: formatGNF(stats.revenue), icon: <IconCurrency />, color: 'text-success', glow: 'hover:shadow-success/15', trend: 'Paiements perçus' },
+    { label: 'Dépenses Totales', value: formatGNF(stats.expenses), icon: <IconCurrency />, color: 'text-danger',  glow: 'hover:shadow-danger/5', trend: 'Coûts écoles' },
+    { label: 'Administrateurs',  value: stats.admins,      icon: <IconUsers />,       color: 'text-muted',   glow: 'hover:shadow-muted/5' },
+    { label: 'Profit Global',    value: formatGNF(stats.revenue - stats.expenses), icon: <IconCheckCircle />, color: 'text-primary', glow: 'hover:shadow-primary/20', trend: 'Marge brute globale' },
   ];
 
   return (
     <div className="space-y-8">
       {/* Stats grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((card) => (
           <StatCard key={card.label} {...card} />
         ))}

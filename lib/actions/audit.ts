@@ -28,11 +28,26 @@ export async function getAuditLogs(opts: {
 }
 
 export async function getDashboardStats() {
-  const [total, active, suspended, admins, recentSchools, recentLogs] = await Promise.all([
+  const [
+    total,
+    active,
+    suspended,
+    admins,
+    studentsCount,
+    teachersCount,
+    paymentsTotal,
+    expensesTotal,
+    recentSchools,
+    recentLogs
+  ] = await Promise.all([
     adminClient.from('schools').select('*', { count: 'exact', head: true }).then((r) => r.count ?? 0),
     adminClient.from('schools').select('*', { count: 'exact', head: true }).eq('status', 'active').then((r) => r.count ?? 0),
     adminClient.from('schools').select('*', { count: 'exact', head: true }).eq('status', 'suspended').then((r) => r.count ?? 0),
     adminClient.from('school_admins').select('*', { count: 'exact', head: true }).then((r) => r.count ?? 0),
+    adminClient.from('students').select('*', { count: 'exact', head: true }).then((r) => r.count ?? 0),
+    adminClient.from('teachers').select('*', { count: 'exact', head: true }).then((r) => r.count ?? 0),
+    adminClient.from('payments').select('amount').eq('status', 'paid').then((r) => (r.data ?? []).reduce((acc, p) => acc + Number(p.amount), 0)),
+    adminClient.from('expenses').select('amount').then((r) => (r.data ?? []).reduce((acc, e) => acc + Number(e.amount), 0)),
     adminClient.from('schools').select('id, name, status, created_at').order('created_at', { ascending: false }).limit(5).then((r) => r.data ?? []),
     adminClient.from('audit_logs').select('id, action, metadata, created_at, target_id').order('created_at', { ascending: false }).limit(5).then((r) => r.data ?? []),
   ]);
@@ -62,7 +77,16 @@ export async function getDashboardStats() {
   }));
 
   return {
-    stats: { total, active, suspended, admins },
+    stats: {
+      total,
+      active,
+      suspended,
+      admins,
+      students: studentsCount,
+      teachers: teachersCount,
+      revenue: paymentsTotal,
+      expenses: expensesTotal,
+    },
     chartData,
     recentSchools: recentSchools.map((s) => ({
       id: s.id,
