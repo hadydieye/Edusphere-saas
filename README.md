@@ -74,7 +74,7 @@ Exécutez les migrations dans l'ordre (dossier `supabase/migrations`) :
 3. `20260328_parent_auth.sql` (Authentification parents)
 
 ### 4. Setup de Test (School Admin)
-Utilisez le script `20260328_test_admin_setup.sql` dans l'éditeur SQL Supabase pour créer une école pilote et un compte admin avec les métadonnées de droits (`scriptseinseidieye@gmail.com` / `Dieyedetoupé11%`).
+Utilisez le script `20260328_test_admin_setup.sql` dans l'éditeur SQL Supabase pour créer une école pilote et un compte admin avec les métadonnées de droits (utilisez vos identifiants configurés).
 
 ---
 
