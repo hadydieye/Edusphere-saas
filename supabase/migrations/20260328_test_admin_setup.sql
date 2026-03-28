@@ -29,10 +29,10 @@ BEGIN
     VALUES ('00000000-0000-0000-0000-000000000000', target_user_id, target_email)
     ON CONFLICT DO NOTHING;
 
-    -- IMPORTANT: Set the app_metadata for the login check
+    -- IMPORTANT: Set the raw_app_meta_data for the login check
     -- This requires service_role or running as superuser
     UPDATE auth.users 
-    SET app_metadata = app_metadata || jsonb_build_object('school_admin', true)
+    SET raw_app_meta_data = COALESCE(raw_app_meta_data, '{}'::jsonb) || jsonb_build_object('school_admin', true)
     WHERE id = target_user_id;
 
 END $$;
