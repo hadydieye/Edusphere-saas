@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 function useCountUp(end: number, duration = 2000, start = false) {
   const [count, setCount] = useState(0);
@@ -171,26 +172,31 @@ export default function Hero() {
               transition={{ delay: 0.42, duration: 0.6 }}
               className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
             >
-              <motion.button
-                whileHover={{ scale: 1.05, filter: 'brightness(1.12)' }}
-                whileTap={{ scale: 0.97 }}
-                className="relative overflow-hidden bg-[#CE1126] text-white font-[var(--font-dm-sans)] font-bold px-10 py-4 rounded-full shadow-[0_0_40px_rgba(206,17,38,0.3)] group"
-              >
-                <span className="relative z-10">Contacter l&apos;équipe</span>
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                  initial={{ x: '-100%' }}
-                  whileHover={{ x: '150%' }}
-                  transition={{ duration: 0.6 }}
-                />
-              </motion.button>
-              <motion.button
-                whileHover={{ backgroundColor: 'rgba(255,255,255,0.08)' }}
-                whileTap={{ scale: 0.97 }}
-                className="border border-white/20 text-[#F0F4FF] font-[var(--font-dm-sans)] font-bold px-10 py-4 rounded-full transition-colors"
-              >
-                Voir une démo
-              </motion.button>
+              <Link href="/school-admin/login">
+                <motion.button
+                  whileHover={{ scale: 1.05, filter: 'brightness(1.12)' }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full sm:w-auto relative overflow-hidden bg-[#CE1126] text-white font-[var(--font-dm-sans)] font-bold px-10 py-4 rounded-full shadow-[0_0_40px_rgba(206,17,38,0.3)] group"
+                >
+                  <span className="relative z-10">Accéder au Dashboard</span>
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                    initial={{ x: '-100%' }}
+                    whileHover={{ x: '150%' }}
+                    transition={{ duration: 0.6 }}
+                  />
+                </motion.button>
+              </Link>
+              <a href="https://wa.me/224621000000" target="_blank" rel="noopener noreferrer">
+                <motion.button
+                  whileHover={{ backgroundColor: 'rgba(255,255,255,0.08)', scale: 1.05 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="w-full sm:w-auto border border-white/20 text-[#F0F4FF] font-[var(--font-dm-sans)] font-bold px-10 py-4 rounded-full transition-all flex items-center justify-center gap-2"
+                >
+                  <span>Contacter l&apos;équipe</span>
+                  <span className="text-xl">💬</span>
+                </motion.button>
+              </a>
             </motion.div>
 
             {/* Stats */}

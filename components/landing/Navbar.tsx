@@ -72,13 +72,19 @@ export default function Navbar() {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden lg:flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-4">
+            <Link
+              href="/school-admin/login"
+              className="font-[var(--font-dm-sans)] text-sm font-bold text-[#F0F4FF] hover:text-[#CE1126] transition-colors"
+            >
+              Se connecter
+            </Link>
             <motion.button
               whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(206,17,38,0.4)' }}
               whileTap={{ scale: 0.97 }}
               className="relative overflow-hidden bg-[#CE1126] text-white font-[var(--font-dm-sans)] text-sm font-bold px-6 py-2.5 rounded-full group"
             >
-              <span className="relative z-10">Contacter l&apos;équipe</span>
+              <span className="relative z-10">Besoin d&apos;aide ?</span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             </motion.button>
           </div>
@@ -158,13 +164,23 @@ export default function Navbar() {
                 ))}
               </nav>
 
-              <div className="p-6 border-t border-[#1A2540]">
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  className="w-full bg-[#CE1126] text-white font-[var(--font-dm-sans)] text-base font-bold px-6 py-4 rounded-full shadow-[0_0_30px_rgba(206,17,38,0.3)]"
-                >
-                  Contacter l&apos;équipe
-                </motion.button>
+              <div className="p-6 border-t border-[#1A2540] space-y-3">
+                <Link href="/school-admin/login" onClick={() => setMobileMenuOpen(false)}>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    className="w-full border border-white/10 text-white font-[var(--font-dm-sans)] text-base font-bold px-6 py-4 rounded-full transition-colors"
+                  >
+                    Se connecter
+                  </motion.button>
+                </Link>
+                <a href="https://wa.me/224621000000" target="_blank" rel="noopener noreferrer">
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    className="w-full bg-[#CE1126] text-white font-[var(--font-dm-sans)] text-base font-bold px-6 py-4 rounded-full shadow-[0_0_30px_rgba(206,17,38,0.3)]"
+                  >
+                    Contacter l&apos;équipe
+                  </motion.button>
+                </a>
               </div>
             </motion.div>
           </>
