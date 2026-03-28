@@ -8,12 +8,20 @@ import { createClient } from '@/lib/supabase/server';
 async function getSchoolId(): Promise<string> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect('/school-admin/login');
+
   const { data } = await adminClient
     .from('school_admins')
     .select('school_id')
-    .eq('user_id', user!.id)
+    .eq('user_id', user.id)
     .single();
-  return data!.school_id;
+
+  if (!data) {
+    console.error('No school associated with user:', user.id);
+    redirect('/school-admin/login');
+  }
+
+  return data.school_id;
 }
 
 // ─── Dashboard stats ──────────────────────────────────────────────────────────

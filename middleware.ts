@@ -35,15 +35,17 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
-  // ── School Admin routes ───────────────────────────────────────────────────
-  if (pathname.startsWith('/school-admin')) {
-    const publicPaths = ['/school-admin/login', '/school-admin/forgot-password', '/school-admin/reset-password'];
-    const isPublic = publicPaths.includes(pathname);
-    if (isPublic) {
-      if (isSchoolAdmin && pathname === '/school-admin/login') return NextResponse.redirect(new URL('/school-admin', request.url));
+  // ── Parent routes ─────────────────────────────────────────────────────────
+  if (pathname.startsWith('/parent')) {
+    const isLoginPage = pathname === '/parent/login';
+    const parentSession = request.cookies.get('parent_session')?.value;
+    
+    if (isLoginPage) {
+      if (parentSession) return NextResponse.redirect(new URL('/parent/dashboard', request.url));
       return response;
     }
-    if (!user || !isSchoolAdmin) return NextResponse.redirect(new URL('/school-admin/login', request.url));
+    
+    if (!parentSession) return NextResponse.redirect(new URL('/parent/login', request.url));
     return response;
   }
 
@@ -51,5 +53,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/super-admin/:path*', '/school-admin/:path*'],
+  matcher: ['/super-admin/:path*', '/school-admin/:path*', '/parent/:path*'],
 };

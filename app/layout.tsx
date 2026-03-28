@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Syne, DM_Sans, Playfair_Display } from "next/font/google";
+import PWARegister from "@/components/PWARegister";
 import "./globals.css";
 
 const syne = Syne({
@@ -24,6 +25,20 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Edusphère | La gestion scolaire réinventée pour la Guinée",
   description: "Plateforme complète de gestion pour les écoles guinéennes : notes, bulletins, inscriptions et paiements Mobile Money.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Edusphère",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#CE1126",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -33,7 +48,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${syne.variable} ${dmSans.variable} ${playfair.variable}`}>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        {children}
+        <PWARegister />
+      </body>
     </html>
   );
 }

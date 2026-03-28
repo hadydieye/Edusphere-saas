@@ -111,7 +111,8 @@ export default function GradesPage() {
       </div>
 
       <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-        <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse min-w-[500px]">
           <thead>
             <tr className="border-b border-border bg-bg/30">
               <th className="px-6 py-4 font-body text-xs font-semibold text-muted uppercase tracking-wider">Élève</th>
@@ -159,6 +160,7 @@ export default function GradesPage() {
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   );
 }

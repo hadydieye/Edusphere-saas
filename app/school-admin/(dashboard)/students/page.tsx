@@ -72,7 +72,8 @@ export default function StudentsPage() {
       />
 
       <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-        <table className="w-full">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px]">
           <thead>
             <tr className="border-b border-border">
               {['Nom', 'Prénom', 'Sexe', 'Classe', 'Statut', 'Actions'].map((col) => (
@@ -115,6 +116,7 @@ export default function StudentsPage() {
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   );
 }

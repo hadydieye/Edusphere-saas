@@ -74,10 +74,16 @@ export default function Navbar() {
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-4">
             <Link
+              href="/parent/login"
+              className="font-[var(--font-dm-sans)] text-sm font-medium text-[#6B7A99] hover:text-[#F0F4FF] transition-colors"
+            >
+              Espace Parents
+            </Link>
+            <Link
               href="/school-admin/login"
               className="font-[var(--font-dm-sans)] text-sm font-bold text-[#F0F4FF] hover:text-[#CE1126] transition-colors"
             >
-              Se connecter
+              Portail École
             </Link>
             <motion.button
               whileHover={{ scale: 1.05, boxShadow: '0 0 20px rgba(206,17,38,0.4)' }}
@@ -165,12 +171,20 @@ export default function Navbar() {
               </nav>
 
               <div className="p-6 border-t border-[#1A2540] space-y-3">
+                <Link href="/parent/login" onClick={() => setMobileMenuOpen(false)}>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    className="w-full bg-white/5 border border-white/10 text-white font-[var(--font-dm-sans)] text-base font-bold px-6 py-4 rounded-full transition-colors"
+                  >
+                    Espace Parents
+                  </motion.button>
+                </Link>
                 <Link href="/school-admin/login" onClick={() => setMobileMenuOpen(false)}>
                   <motion.button
                     whileTap={{ scale: 0.97 }}
                     className="w-full border border-white/10 text-white font-[var(--font-dm-sans)] text-base font-bold px-6 py-4 rounded-full transition-colors"
                   >
-                    Se connecter
+                    Portail École
                   </motion.button>
                 </Link>
                 <a href="https://wa.me/224621000000" target="_blank" rel="noopener noreferrer">
