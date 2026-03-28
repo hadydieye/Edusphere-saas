@@ -12,7 +12,7 @@ ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name;
 /* 
 INSTRUCTIONS FOR THE USER:
 1. Go to Supabase Dashboard > Authentication > Users
-2. Create a user: admin@ecole.gn / password: admin123
+2. Create a user: scriptseinseidieye@gmail.com / password: Dieyedetoupé11%
 3. Copy the 'User ID' of this new user.
 4. Replace 'YOUR_USER_ID' below with that ID and run the rest of this script.
 */
@@ -25,7 +25,7 @@ DECLARE
 BEGIN
     -- Link to school_admins table
     INSERT INTO school_admins (school_id, user_id, email)
-    VALUES ('00000000-0000-0000-0000-000000000000', target_user_id, 'admin@ecole.gn')
+    VALUES ('00000000-0000-0000-0000-000000000000', target_user_id, 'scriptseinseidieye@gmail.com')
     ON CONFLICT DO NOTHING;
 
     -- IMPORTANT: Set the app_metadata for the login check
