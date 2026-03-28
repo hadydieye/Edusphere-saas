@@ -4,15 +4,28 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from '@/lib/actions/school-auth';
 import Logo from '@/components/Logo';
+import OnboardingWizard from './OnboardingWizard';
 
 const NAV = [
   { href: '/school-admin',          label: 'Dashboard', icon: '📊' },
   { href: '/school-admin/students', label: 'Élèves',    icon: '👨‍🎓' },
   { href: '/school-admin/classes',  label: 'Classes',   icon: '🏫' },
+  { href: '/school-admin/teachers', label: 'Enseignants', icon: '👨‍🏫' },
+  { href: '/school-admin/attendance',label: 'Présences', icon: '📅' },
+  { href: '/school-admin/expenses',  label: 'Dépenses', icon: '💸' },
   { href: '/school-admin/payments', label: 'Paiements', icon: '💰' },
+  { href: '/school-admin/grades',   label: 'Notes',     icon: '📝' },
+  { href: '/school-admin/bulletins',label: 'Bulletins', icon: '📄' },
+  { href: '/school-admin/settings', label: 'Paramètres', icon: '⚙️' },
 ];
 
-export default function SchoolAdminLayout({ children }: { children: React.ReactNode }) {
+interface Props {
+  children: React.ReactNode;
+  school?: { name: string; onboarding_done: boolean } | null;
+  overdueCount?: number;
+}
+
+export default function SchoolAdminLayout({ children, school, overdueCount = 0 }: Props) {
   const pathname = usePathname();
 
   return (
@@ -37,6 +50,11 @@ export default function SchoolAdminLayout({ children }: { children: React.ReactN
               >
                 <span>{item.icon}</span>
                 {item.label}
+                {item.label === 'Paiements' && overdueCount > 0 && (
+                  <span className="ml-auto w-5 h-5 flex items-center justify-center bg-danger text-white text-[10px] font-bold rounded-full">
+                    {overdueCount}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -58,6 +76,10 @@ export default function SchoolAdminLayout({ children }: { children: React.ReactN
         </header>
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
+
+      {school && !school.onboarding_done && (
+        <OnboardingWizard schoolName={school.name} />
+      )}
     </div>
   );
 }

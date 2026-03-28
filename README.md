@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Edusphère SaaS 🏫
 
-## Getting Started
+**Edusphère** est une plateforme SaaS de gestion scolaire moderne et intuitive, conçue spécifiquement pour répondre aux besoins des établissements d'enseignement en Guinée. Elle permet aux administrateurs de centraliser la gestion des élèves, du personnel, des finances et de la communication.
 
-First, run the development server:
+## 🚀 Fonctionnalités Clés
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 👨‍💼 Super Admin
+- Gestion des écoles partenaires.
+- Monitoring global de la plateforme.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 🏫 School Admin (Gestion d'Établissement)
+- **Tableau de Bord Intuitif** : Vue d'ensemble des revenus, dépenses et effectifs.
+- **Gestion des Élèves** : Inscriptions, suivi des dossiers et statuts.
+- **Gestion des Classes** : Organisation par niveaux et filières.
+- **Suivi des Paiements** : Gestion des scolarités, facturation et relances.
+- **Gestion des Notes & Bulletins** : Saisie des notes par période et génération automatique de bulletins PDF.
+- **Suivi des Présences** : Pointage journalier des absences et retards.
+- **Gestion du Personnel** : Répertoire des enseignants et staff.
+- **Suivi des Dépenses** : Contrôle des sorties de fonds (salaires, loyers, fournitures).
+- **Notifications SMS** : Envoi de rappels aux parents pour les paiements et absences.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Stack Technique
+- **Frontend** : Next.js 14 (App Router), Tailwind CSS.
+- **Animations** : Framer Motion.
+- **Backend & Auth** : Supabase (PostgreSQL, Auth, RLS).
+- **Documents** : @react-pdf/renderer.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📈 État d'Avancement (Mars 2026)
+Nous avons récemment complété la phase d'implémentation des modules cœurs :
+- [x] **Module Présences** : Système d'émargement fonctionnel.
+- [x] **Module Enseignants** : CRUD complet du personnel.
+- [x] **Module Dépenses** : Intégration financière et calcul du profit net.
+- [x] **Infrastructure SMS** : Couche d'abstraction `lib/sms.ts` prête pour intégration passerelle locale.
 
-## Learn More
+## ⚙️ Installation & Lancement
 
-To learn more about Next.js, take a look at the following resources:
+1. **Cloner le projet** :
+   ```bash
+   git clone https://github.com/hadydieye/Edusphere-saas.git
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. **Installer les dépendances** :
+   ```bash
+   npm install
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. **Variables d'environnement** :
+   Créer un fichier `.env.local` avec les clés Supabase :
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   ```
 
-## Deploy on Vercel
+4. **Lancer le serveur** :
+   ```bash
+   npm run dev
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+*Edusphère - L'excellence au service de l'éducation.*

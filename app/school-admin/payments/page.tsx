@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
-import { getPayments } from '@/lib/actions/school-admin';
+import { getPayments, getSchoolProfile } from '@/lib/actions/school-admin';
+import DownloadReceiptButton from '@/components/school-admin/DownloadReceiptButton';
 
 type Payment = { id: string; amount: number; label: string; status: string; paid_at: string | null; created_at: string; students: { first_name: string; last_name: string } | null };
 
@@ -18,12 +19,17 @@ export default function PaymentsPage() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
+  const [school, setSchool] = useState<any>(null);
 
   const load = useCallback(async (p: number) => {
     setIsLoading(true);
-    const res = await getPayments({ page: p });
+    const [res, schoolData] = await Promise.all([
+      getPayments({ page: p }),
+      getSchoolProfile()
+    ]);
     setPayments(res.payments as unknown as Payment[]);
     setTotal(res.total);
+    setSchool(schoolData);
     setIsLoading(false);
   }, []);
 
@@ -74,8 +80,9 @@ export default function PaymentsPage() {
                 <td className="px-4 py-3">
                   <span className={`font-mono text-xs px-2 py-0.5 rounded-full border ${STATUS_STYLE[p.status]}`}>{STATUS_LABEL[p.status]}</span>
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-muted">
-                  {new Date(p.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}
+                <td className="px-4 py-3 font-mono text-xs text-muted space-x-3">
+                  <span>{new Date(p.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}</span>
+                  {school && <DownloadReceiptButton payment={p} school={school} />}
                 </td>
               </tr>
             ))}

@@ -2,9 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 :root {
+  /* next/font injects --font-syne, --font-dm-sans, --font-playfair on <html> */
   --bg:        #080C14;
   --surface:   #0F1724;
   --border:    #1E2D45;
@@ -19,6 +18,22 @@
   --font-display: 'Syne', sans-serif;
   --font-body:    'DM Sans', sans-serif;
   --font-mono:    'JetBrains Mono', monospace;
+
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --rouge: 354 84% 44%; /* #CE1126 */
+  --or: 48 97% 54%;    /* #FCD116 */
+  --vert: 159 100% 29%; /* #009460 */
+  --bg-landing: 220 45% 4%;    /* #06090F */
+  --surface-landing: 222 41% 9%; /* #0D1320 */
+  --border-landing: 222 42% 18%; /* #1A2540 */
+  --text-landing: 225 100% 97%;  /* #F0F4FF */
+  --muted-landing: 220 18% 51%;  /* #6B7A99 */
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98.1%;
 }
 
 * {
@@ -38,4 +53,40 @@ h1, h2, h3, h4, h5, h6 {
 
 code, kbd, pre, .mono {
   font-family: var(--font-mono);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+  }
+
+  /* Grain Texture Overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 9999;
+  }
+}
+
+@layer utilities {
+  .text-gradient-rouge-or {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#CE1126] to-[#FCD116];
+  }
+  .text-gradient-vert-cyan {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#009460] to-[#00E5FF];
+  }
+  .bg-african-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='none' stroke='white' stroke-opacity='0.1' stroke-width='0.5'/%3E%3Ccircle cx='30' cy='30' r='3' fill='none' stroke='white' stroke-opacity='0.05'/%3E%3C/svg%3E");
+  }
 }

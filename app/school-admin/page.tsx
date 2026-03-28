@@ -1,7 +1,11 @@
-import { getSchoolDashboard } from '@/lib/actions/school-admin';
+import { getSchoolDashboard, getPendingPaymentsCount } from '@/lib/actions/school-admin';
+import Link from 'next/link';
 
 export default async function SchoolDashboardPage() {
-  const { school, stats, recentStudents } = await getSchoolDashboard();
+  const [{ school, stats, recentStudents }, overdueCount] = await Promise.all([
+    getSchoolDashboard(),
+    getPendingPaymentsCount()
+  ]);
 
   return (
     <div className="space-y-6">
@@ -10,16 +14,30 @@ export default async function SchoolDashboardPage() {
         <p className="font-body text-sm text-muted mt-1">Vue d'ensemble de votre établissement</p>
       </div>
 
+      {overdueCount > 0 && (
+        <div className="bg-danger/10 border border-danger/20 rounded-2xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-xl">⚠️</span>
+            <div>
+              <p className="font-body text-sm font-semibold text-danger">{overdueCount} paiement(s) en retard</p>
+              <p className="font-body text-xs text-danger/80">Certains paiements en attente datent de plus d'une semaine.</p>
+            </div>
+          </div>
+          <Link href="/school-admin/payments" className="text-danger font-body text-sm font-bold hover:underline">Voir tout →</Link>
+        </div>
+      )}
+
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Total élèves',    value: stats.totalStudents,  color: 'text-text' },
-          { label: 'Élèves actifs',   value: stats.activeStudents, color: 'text-success' },
-          { label: 'Recettes (GNF)',  value: stats.totalPayments.toLocaleString('fr-FR'), color: 'text-accent' },
+          { label: 'Recettes',        value: `${stats.totalPayments.toLocaleString('fr-FR')} GNF`, color: 'text-success' },
+          { label: 'Dépenses',        value: `${stats.totalExpenses.toLocaleString('fr-FR')} GNF`, color: 'text-danger' },
+          { label: 'Bénéfice Net',    value: `${(stats.totalPayments - stats.totalExpenses).toLocaleString('fr-FR')} GNF`, color: 'text-accent' },
         ].map((s) => (
           <div key={s.label} className="bg-surface border border-border rounded-2xl p-5 space-y-2">
-            <p className="font-body text-sm text-muted">{s.label}</p>
-            <p className={`font-display text-3xl font-bold ${s.color}`}>{s.value}</p>
+            <p className="font-body text-xs text-muted font-medium uppercase">{s.label}</p>
+            <p className={`font-display text-xl font-bold ${s.color}`}>{s.value}</p>
           </div>
         ))}
       </div>

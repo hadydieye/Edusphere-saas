@@ -4,7 +4,18 @@ import { useState, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { getStudents } from '@/lib/actions/school-admin';
 
-type Student = { id: string; first_name: string; last_name: string; gender: string; status: string; classes: { name: string } | null; created_at: string };
+type Student = { 
+  id: string; 
+  first_name: string; 
+  last_name: string; 
+  gender: string; 
+  status: string; 
+  guardian_phone: string;
+  classes: { name: string } | null; 
+  created_at: string 
+};
+
+import { sendSMSNotification } from '@/lib/actions/school-admin';
 
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -12,6 +23,7 @@ export default function StudentsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [sendingSms, setSendingSms] = useState<string | null>(null);
 
   const load = useCallback(async (p: number, q: string) => {
     setIsLoading(true);
@@ -20,6 +32,22 @@ export default function StudentsPage() {
     setTotal(res.total);
     setIsLoading(false);
   }, []);
+
+  const handleSendReminder = async (student: Student) => {
+    if (!student.guardian_phone) {
+      alert("Aucun numéro de tuteur enregistré.");
+      return;
+    }
+    setSendingSms(student.id);
+    const msg = `Edusphère: Rappel pour ${student.first_name} ${student.last_name}. Veuillez passer à l'administration. Merci.`;
+    const res = await sendSMSNotification(student.id, msg);
+    setSendingSms(null);
+    if (res.success) {
+      alert("SMS envoyé avec succès !");
+    } else {
+      alert("Erreur: " + res.error);
+    }
+  };
 
   useEffect(() => { load(page, search); }, [page, search, load]);
 
@@ -47,7 +75,7 @@ export default function StudentsPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-border">
-              {['Nom', 'Prénom', 'Sexe', 'Classe', 'Statut', 'Inscription'].map((col) => (
+              {['Nom', 'Prénom', 'Sexe', 'Classe', 'Statut', 'Actions'].map((col) => (
                 <th key={col} className="px-4 py-3 text-left font-body text-xs font-medium text-muted uppercase tracking-wider">{col}</th>
               ))}
             </tr>
@@ -72,8 +100,15 @@ export default function StudentsPage() {
                     s.status === 'active' ? 'bg-success/10 text-success border-success/20' : 'bg-danger/10 text-danger border-danger/20'
                   }`}>{s.status === 'active' ? 'Actif' : 'Inactif'}</span>
                 </td>
-                <td className="px-4 py-3 font-mono text-xs text-muted">
-                  {new Date(s.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}
+                <td className="px-4 py-3">
+                  <button 
+                    onClick={() => handleSendReminder(s)}
+                    disabled={sendingSms === s.id}
+                    title="Envoyer un rappel SMS"
+                    className="p-1.5 rounded-lg border border-border hover:bg-bg text-muted hover:text-accent transition-all disabled:opacity-50"
+                  >
+                    {sendingSms === s.id ? '...' : '🔔'}
+                  </button>
                 </td>
               </tr>
             ))}
