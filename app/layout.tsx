@@ -31,6 +31,10 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Edusphère",
   },
+  icons: {
+    icon: "/icons/icon-192.png",
+    apple: "/icons/icon-192.png",
+  },
 };
 
 export const viewport: Viewport = {
