@@ -6,7 +6,7 @@
 
 ### 👨‍💼 Super Admin
 - Gestion des écoles partenaires.
-- Monitoring global de la plateforme.
+- **Monitoring Global** : Vue consolidée des effectifs (élèves, profs) et finances (revenus, dépenses, profit global) de toute la plateforme.
 
 ### 🏫 School Admin (Gestion d'Établissement)
 - **Tableau de Bord Intuitif** : Vue d'ensemble des revenus, dépenses et effectifs.
