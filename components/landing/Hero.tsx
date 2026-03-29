@@ -4,21 +4,37 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 
-function useCountUp(end: number, duration = 2000, start = false) {
-  const [count, setCount] = useState(0);
+function useCountUp(target: number, duration: number = 2000) {
+  const [count, setCount] = useState(0)
+  const [started, setStarted] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
-    if (!start) return;
-    let startTime: number;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started) {
+          setStarted(true)
+        }
+      },
+      { threshold: 0.5 }
+    )
+    if (ref.current) observer.observe(ref.current)
+    return () => observer.disconnect()
+  }, [started])
+
+  useEffect(() => {
+    if (!started) return
+    let startTime: number
     const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(eased * end));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [end, duration, start]);
-  return count;
+      if (!startTime) startTime = timestamp
+      const progress = Math.min((timestamp - startTime) / duration, 1)
+      setCount(Math.floor(progress * target))
+      if (progress < 1) requestAnimationFrame(step)
+    }
+    requestAnimationFrame(step)
+  }, [started, target, duration])
+
+  return { count, ref }
 }
 
 function ParticleCanvas() {
@@ -83,20 +99,9 @@ function ParticleCanvas() {
 }
 
 export default function Hero() {
-  const statsRef = useRef<HTMLDivElement>(null);
-  const [statsVisible, setStatsVisible] = useState(false);
-  const schools = useCountUp(120, 2000, statsVisible);
-  const students = useCountUp(15000, 2200, statsVisible);
-
-  useEffect(() => {
-    const el = statsRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setStatsVisible(true); observer.disconnect(); }
-    }, { threshold: 0.3 });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  const { count: schools, ref: schoolsRef } = useCountUp(120);
+  const { count: students, ref: studentsRef } = useCountUp(15000);
+  const { count: satisfaction, ref: satisfactionRef } = useCountUp(99);
 
   return (
     <section className="relative min-h-screen pt-28 pb-24 overflow-hidden flex items-center">
@@ -201,20 +206,20 @@ export default function Hero() {
 
             {/* Stats */}
             <motion.div
-              ref={statsRef}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.62 }}
               className="pt-10 grid grid-cols-3 gap-4 border-t border-white/5"
             >
               {[
-                { value: `${schools}+`, label: 'Écoles' },
-                { value: `${(students / 1000).toFixed(0)} 000+`, label: 'Élèves' },
-                { value: '99%', label: 'Satisfaction' },
+                { count: schools, suffix: '+', label: 'Écoles', ref: schoolsRef },
+                { count: students, suffix: '+', label: 'Élèves', ref: studentsRef, format: true },
+                { count: satisfaction, suffix: '%', label: 'Satisfaction', ref: satisfactionRef },
               ].map((stat) => (
-                <div key={stat.label} className="text-center lg:text-left">
+                <div key={stat.label} ref={stat.ref} className="text-center lg:text-left">
                   <p className="font-[var(--font-syne)] text-2xl lg:text-3xl font-extrabold text-[#F0F4FF] tabular-nums">
-                    {stat.value}
+                    {stat.format ? stat.count.toLocaleString('fr-FR').replace(/\u00a0/g, ' ') : stat.count}
+                    {stat.suffix}
                   </p>
                   <p className="font-[var(--font-dm-sans)] text-xs uppercase tracking-widest text-[#6B7A99] mt-1">
                     {stat.label}

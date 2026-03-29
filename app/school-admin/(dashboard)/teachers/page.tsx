@@ -12,7 +12,8 @@ export default function TeachersPage() {
     last_name: '',
     phone: '',
     email: '',
-    specialty: ''
+    specialty: '',
+    password: ''
   });
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function TeachersPage() {
     if (error) {
       alert('Erreur: ' + error);
     } else {
-      setFormData({ first_name: '', last_name: '', phone: '', email: '', specialty: '' });
+      setFormData({ first_name: '', last_name: '', phone: '', email: '', specialty: '', password: '' });
       setIsAdding(false);
       loadTeachers();
     }
@@ -106,6 +107,17 @@ export default function TeachersPage() {
                 value={formData.specialty}
                 onChange={e => setFormData({ ...formData, specialty: e.target.value })}
                 placeholder="Ex: Mathématiques"
+                className="w-full bg-bg border border-border rounded-xl px-3 py-2 text-sm font-body text-text outline-none focus:border-accent"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="font-body text-xs font-medium text-muted uppercase">Mot de passe (Accès Espace Enseignant)</label>
+              <input 
+                type="password"
+                required
+                value={formData.password}
+                onChange={e => setFormData({ ...formData, password: e.target.value })}
+                placeholder="••••••••"
                 className="w-full bg-bg border border-border rounded-xl px-3 py-2 text-sm font-body text-text outline-none focus:border-accent"
               />
             </div>

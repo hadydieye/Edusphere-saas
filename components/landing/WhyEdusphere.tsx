@@ -1,203 +1,139 @@
-'use client';
+'use client'
 
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+
+const cities = [
+  { name: 'Conakry', cx: 78, cy: 285, r: 6, isCapital: true, delay: 0 },
+  { name: 'Kindia', cx: 112, cy: 248, r: 4, delay: 0.5 },
+  { name: 'Labé', cx: 168, cy: 168, r: 4, delay: 1 },
+  { name: 'Mamou', cx: 195, cy: 212, r: 4, delay: 1.5 },
+  { name: 'Kankan', cx: 298, cy: 195, r: 4, delay: 2 },
+  { name: 'N\'Zérékoré', cx: 268, cy: 342, r: 4, delay: 2.5 },
+  { name: 'Boké', cx: 88, cy: 155, r: 4, delay: 3 },
+  { name: 'Faranah', cx: 235, cy: 248, r: 4, delay: 3.5 },
+]
 
 const points = [
   {
     icon: '📶',
-    text: 'Fonctionne hors ligne — sync automatique au retour du réseau',
+    title: 'Offline-first natif',
+    desc: 'Données stockées localement, sync automatique au retour du réseau.',
+    color: 'rgba(0,148,96,0.15)',
+    border: '#009460',
   },
   {
     icon: '💳',
-    text: 'Orange Money & MTN MoMo — paiements sans commission cachée',
+    title: 'Mobile Money sans commission',
+    desc: 'Orange Money & MTN MoMo directement intégrés. Zéro frais cachés.',
+    color: 'rgba(252,209,22,0.15)',
+    border: '#FCD116',
   },
   {
     icon: '💬',
-    text: 'SMS pour les parents sans smartphone ni data internet',
+    title: 'SMS sans data internet',
+    desc: 'Les parents reçoivent les alertes même sans forfait data actif.',
+    color: 'rgba(206,17,38,0.15)',
+    border: '#CE1126',
   },
   {
     icon: '🔒',
-    text: 'Données sécurisées, conformes aux standards internationaux',
+    title: 'Sécurité internationale',
+    desc: 'Données isolées par école, chiffrées et conformes aux standards RGPD.',
+    color: 'rgba(0,148,96,0.15)',
+    border: '#009460',
   },
-];
-
-// Guinea SVG with animated city points
-function GuineaMap() {
-  const cities = [
-    { name: 'Conakry', cx: 22, cy: 68 },
-    { name: 'Kindia', cx: 30, cy: 58 },
-    { name: 'Labé', cx: 42, cy: 40 },
-    { name: 'Kankan', cx: 70, cy: 44 },
-    { name: 'N\'Zérékoré', cx: 62, cy: 78 },
-  ];
-
-  const connections = [
-    [0, 1], [1, 2], [2, 3], [3, 4], [1, 4],
-  ];
-
-  return (
-    <svg viewBox="0 0 100 100" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-      {/* Simplified Guinea shape */}
-      <path
-        d="M18 65 L14 55 L16 45 L20 38 L28 30 L36 26 L45 22 L55 24 L63 20 L72 26 L80 34 L82 44 L78 52 L74 60 L68 70 L60 80 L52 88 L44 90 L36 86 L28 80 L22 72 Z"
-        fill="rgba(0,148,96,0.08)"
-        stroke="rgba(0,148,96,0.3)"
-        strokeWidth="0.8"
-      />
-
-      {/* Connection lines */}
-      {connections.map(([a, b], i) => (
-        <line
-          key={i}
-          x1={cities[a].cx}
-          y1={cities[a].cy}
-          x2={cities[b].cx}
-          y2={cities[b].cy}
-          stroke="rgba(0,148,96,0.2)"
-          strokeWidth="0.5"
-          strokeDasharray="2,2"
-        />
-      ))}
-
-      {/* City pulse animations */}
-      {cities.map((city, i) => (
-        <g key={city.name}>
-          {/* Outer pulse */}
-          <circle cx={city.cx} cy={city.cy} r="6" fill="none" stroke="#009460" strokeWidth="0.5" opacity="0.3">
-            <animate attributeName="r" values="4;10;4" dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.5;0;0.5" dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
-          </circle>
-          {/* Inner dot */}
-          <circle cx={city.cx} cy={city.cy} r="2" fill="#009460" opacity="0.9" />
-          {/* City name */}
-          <text
-            x={city.cx + 3}
-            y={city.cy - 3}
-            fontSize="4"
-            fill="rgba(255,255,255,0.5)"
-            fontFamily="var(--font-dm-sans)"
-          >
-            {city.name}
-          </text>
-        </g>
-      ))}
-    </svg>
-  );
-}
+]
 
 export default function WhyEdusphere() {
   return (
-    <section className="relative bg-[#06090F] py-28 border-t border-[#1A2540] overflow-hidden">
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <div className="grid lg:grid-cols-2 gap-16 xl:gap-24 items-center">
-
-          {/* LEFT — Guinea Map Illustration */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="relative h-80 lg:h-[420px] flex items-center justify-center order-2 lg:order-1"
-          >
-            {/* Glow behind map */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-64 h-64 rounded-full" style={{ background: 'radial-gradient(circle, rgba(0,148,96,0.12) 0%, transparent 70%)' }} />
-            </div>
-
-            <div className="relative w-64 h-64 lg:w-80 lg:h-80">
-              <GuineaMap />
-            </div>
-
-            {/* Decorative corner badges */}
+    <section className="bg-[#0D1320] py-24 px-6 overflow-hidden">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          
+          <div className="relative flex justify-center items-center group">
             <motion.div
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute top-4 right-4 px-3 py-2 rounded-xl text-xs font-bold"
-              style={{ background: 'rgba(0,148,96,0.15)', border: '1px solid rgba(0,148,96,0.3)', color: '#009460', fontFamily: 'var(--font-dm-sans)' }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: 'easeOut' }}
+              className="relative w-full max-w-[500px]"
             >
-              🟢 Sync active
+              {/* Soft glow background */}
+              <div 
+                className="absolute inset-0 rounded-full blur-[80px] opacity-20 group-hover:opacity-30 transition-opacity duration-700"
+                style={{ background: 'radial-gradient(circle, #CE1126 0%, #FCD116 50%, #009460 100%)' }}
+              />
+              
+              <img
+                src="/images/guinea_map.png"
+                alt="Carte de la Guinée Edusphère"
+                className="relative z-10 w-full h-auto drop-shadow-[0_0_30px_rgba(252,209,22,0.15)]"
+                style={{ mixBlendMode: 'screen' }}
+              />
+              
+              {/* Floating indicators for premium feel */}
+              <motion.div
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute top-1/4 left-1/4 z-20 w-3 h-3 bg-[#CE1126] rounded-full shadow-[0_0_15px_#CE1126]"
+              />
+              <motion.div
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+                className="absolute bottom-1/3 right-1/4 z-20 w-3 h-3 bg-[#009460] rounded-full shadow-[0_0_15px_#009460]"
+              />
             </motion.div>
+          </div>
 
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-              className="absolute bottom-8 left-4 px-3 py-2 rounded-xl text-xs font-bold"
-              style={{ background: 'rgba(252,209,22,0.1)', border: '1px solid rgba(252,209,22,0.25)', color: '#FCD116', fontFamily: 'var(--font-dm-sans)' }}
-            >
-              5 villes connectées
-            </motion.div>
-          </motion.div>
-
-          {/* RIGHT — Text */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="space-y-8 order-1 lg:order-2"
-          >
-            <div className="space-y-2">
-              <span className="font-[var(--font-syne)] text-xs font-bold tracking-[0.25em] uppercase text-[#FCD116]">
-                Pourquoi Edusphère
+          {/* COLONNE DROITE — Texte */}
+          <div className="space-y-8">
+            <div className="space-y-4">
+              <span className="text-xs tracking-widest text-[#CE1126] uppercase font-bold">
+                POURQUOI EDUSPHÈRE
               </span>
-              <h2 className="font-[var(--font-syne)] text-3xl md:text-4xl font-extrabold text-[#F0F4FF] leading-tight">
-                Pas juste un logiciel.{' '}
-                <br />
-                Votre{' '}
-                <em style={{ fontFamily: 'var(--font-playfair)', color: '#FCD116', fontStyle: 'italic' }}>
-                  partenaire.
-                </em>
+              <h2 className="font-[var(--font-syne)] text-[48px] leading-tight text-[#F0F4FF] font-extrabold">
+                Pas juste un logiciel.<br />
+                Votre <span className="font-[var(--font-playfair)] italic text-[#FCD116]">partenaire.</span>
               </h2>
+              <p className="font-[var(--font-dm-sans)] text-[#6B7A99] text-xl">
+                Conçu pour la réalité du terrain guinéen, pas copié sur un modèle étranger.
+              </p>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-6">
               {points.map((point, i) => (
                 <motion.div
-                  key={point.text}
-                  initial={{ opacity: 0, x: 20 }}
+                  key={point.title}
+                  initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.12, duration: 0.5 }}
-                  className="flex items-start gap-4 group"
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ delay: i * 0.15, duration: 0.5 }}
+                  className="flex gap-4 items-start"
                 >
-                  <div
-                    className="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-transform group-hover:scale-110"
-                    style={{ background: 'rgba(252,209,22,0.1)' }}
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center text-xl flex-shrink-0 border"
+                    style={{ 
+                      backgroundColor: point.color, 
+                      borderColor: `${point.border}4d` 
+                    }}
                   >
                     {point.icon}
                   </div>
-                  <div className="flex items-start gap-3 pt-2">
-                    <svg
-                      className="flex-shrink-0 mt-0.5"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                    >
-                      <circle cx="8" cy="8" r="7" fill="rgba(252,209,22,0.15)" />
-                      <path d="M4.5 8L7 10.5L11.5 6" stroke="#FCD116" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <p className="font-[var(--font-dm-sans)] text-[#6B7A99] group-hover:text-[#F0F4FF] transition-colors text-sm leading-relaxed">
-                      {point.text}
+                  <div>
+                    <h3 className="font-[var(--font-dm-sans)] font-semibold text-[#F0F4FF] text-lg">
+                      {point.title}
+                    </h3>
+                    <p className="font-[var(--font-dm-sans)] text-[#6B7A99]">
+                      {point.desc}
                     </p>
                   </div>
                 </motion.div>
               ))}
             </div>
-
-            <motion.button
-              whileHover={{ scale: 1.04, boxShadow: '0 0 30px rgba(206,17,38,0.35)' }}
-              whileTap={{ scale: 0.97 }}
-              className="inline-flex items-center gap-2 bg-[#CE1126] text-white font-[var(--font-dm-sans)] font-bold px-8 py-4 rounded-full"
-            >
-              En savoir plus
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </motion.button>
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>
-  );
+  )
 }

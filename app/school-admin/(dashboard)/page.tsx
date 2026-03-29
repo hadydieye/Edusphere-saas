@@ -2,10 +2,12 @@ import { getSchoolDashboard, getPendingPaymentsCount } from '@/lib/actions/schoo
 import Link from 'next/link';
 
 export default async function SchoolDashboardPage() {
+  console.log('--- RENDERING SCHOOL DASHBOARD PAGE ---');
   const [{ school, stats, recentStudents }, overdueCount] = await Promise.all([
     getSchoolDashboard(),
     getPendingPaymentsCount()
   ]);
+  console.log('--- DASHBOARD DATA FETCHED ---', { schoolName: school?.name });
 
   return (
     <div className="space-y-6">

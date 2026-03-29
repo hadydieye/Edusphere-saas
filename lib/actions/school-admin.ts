@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { adminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { smsService, formatGuineanPhone } from '@/lib/sms';
 
 async function getSchoolId(): Promise<string> {
   const supabase = await createClient();
@@ -29,15 +30,14 @@ async function getSchoolId(): Promise<string> {
 export async function getSchoolDashboard() {
   const schoolId = await getSchoolId();
 
-  const [totalStudents, activeStudents, totalPayments, totalExpenses, recentStudents] = await Promise.all([
+  const [totalStudents, activeStudents, totalPayments, totalExpenses, recentStudents, { data: school }] = await Promise.all([
     adminClient.from('students').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).then(r => r.count ?? 0),
     adminClient.from('students').select('*', { count: 'exact', head: true }).eq('school_id', schoolId).eq('status', 'active').then(r => r.count ?? 0),
     adminClient.from('payments').select('amount').eq('school_id', schoolId).eq('status', 'paid').then(r => (r.data ?? []).reduce((s, p) => s + Number(p.amount), 0)),
     adminClient.from('expenses').select('amount').eq('school_id', schoolId).then(r => (r.data ?? []).reduce((s, e) => s + Number(e.amount), 0)),
     adminClient.from('students').select('id, first_name, last_name, status, created_at').eq('school_id', schoolId).order('created_at', { ascending: false }).limit(5).then(r => r.data ?? []),
+    adminClient.from('schools').select('name, status, onboarding_done').eq('id', schoolId).single(),
   ]);
-
-  const { data: school } = await adminClient.from('schools').select('name, status, onboarding_done').eq('id', schoolId).single();
 
   return { school, stats: { totalStudents, activeStudents, totalPayments, totalExpenses }, recentStudents };
 }
@@ -74,6 +74,58 @@ export async function createStudent(input: {
 
   revalidatePath('/school-admin/students');
   redirect('/school-admin/students');
+}
+
+export async function getStudentDetails(id: string) {
+  const schoolId = await getSchoolId();
+  const { data, error } = await adminClient
+    .from('students')
+    .select('*, classes(name)')
+    .eq('id', id)
+    .eq('school_id', schoolId)
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function getRankInClass(studentId: string, classId: string, period: string) {
+  const schoolId = await getSchoolId();
+
+  // 1. Get all students in the class
+  const { data: students } = await adminClient
+    .from('students')
+    .select('id')
+    .eq('class_id', classId)
+    .eq('school_id', schoolId);
+
+  if (!students) return null;
+
+  // 2. Get grades for all students in this class/period
+  const { data: allGrades } = await adminClient
+    .from('grades')
+    .select('student_id, score')
+    .in('student_id', students.map(s => s.id))
+    .eq('period', period)
+    .eq('school_id', schoolId);
+
+  if (!allGrades) return null;
+
+  // 3. Group by student and calculate average
+  const averages: { id: string; avg: number }[] = students.map(s => {
+    const sGrades = allGrades.filter(g => g.student_id === s.id);
+    const avg = sGrades.length > 0 
+      ? sGrades.reduce((acc, g) => acc + (Number(g.score) || 0), 0) / sGrades.length
+      : 0;
+    return { id: s.id, avg };
+  });
+
+  // 4. Sort by average DESC
+  averages.sort((a, b) => b.avg - a.avg);
+
+  // 5. Find index of studentId
+  const rank = averages.findIndex(a => a.id === studentId) + 1;
+  return { rank, total: students.length, avg: averages.find(a => a.id === studentId)?.avg || 0 };
 }
 
 // ─── Classes ──────────────────────────────────────────────────────────────────
@@ -140,6 +192,57 @@ export async function createPayment(input: {
 
   revalidatePath('/school-admin/payments');
   redirect('/school-admin/payments');
+}
+
+export async function getLatePayments() {
+  const schoolId = await getSchoolId();
+  const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+
+  // 1. Get all active students
+  const { data: students } = await adminClient
+    .from('students')
+    .select('id, first_name, last_name, guardian_phone, classes(name)')
+    .eq('school_id', schoolId)
+    .eq('status', 'active');
+
+  if (!students) return [];
+
+  // 2. Get students who paid this month
+  const { data: paidRecords } = await adminClient
+    .from('payments')
+    .select('student_id')
+    .eq('school_id', schoolId)
+    .eq('status', 'paid')
+    .gte('created_at', `${currentMonth}-01`);
+
+  const paidIds = new Set((paidRecords ?? []).map(p => p.student_id));
+
+  // 3. Filter students who haven't paid
+  return students.filter(s => !paidIds.has(s.id));
+}
+
+export async function sendBulkPaymentReminders(studentIds: string[]) {
+  const schoolId = await getSchoolId();
+  const { data: students } = await adminClient
+    .from('students')
+    .select('first_name, last_name, guardian_phone')
+    .in('id', studentIds);
+
+  if (!students) return 'Erreur lors de la récupération des élèves.';
+
+  let sentCount = 0;
+  for (const student of students) {
+    if (student.guardian_phone) {
+      const message = `Edusphère Rappel: Le paiement de la scolarité pour ${student.first_name} ${student.last_name} est en attente. Merci de régulariser au plus vite.`;
+      const res = await smsService.send({
+        to: formatGuineanPhone(student.guardian_phone),
+        message
+      });
+      if (res.success) sentCount++;
+    }
+  }
+
+  return `Rappels envoyés avec succès à ${sentCount} parents.`;
 }
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
@@ -320,6 +423,7 @@ export async function saveAttendance(records: {
 }[]) {
   const schoolId = await getSchoolId();
 
+  // 1. Save attendance records
   const { error } = await adminClient
     .from('attendance')
     .upsert(records.map(r => ({ ...r, school_id: schoolId })), {
@@ -327,6 +431,33 @@ export async function saveAttendance(records: {
     });
 
   if (error) return error.message;
+
+  // 2. Trigger SMS for absent students
+  const absentStudents = records.filter(r => r.status === 'absent');
+  if (absentStudents.length > 0) {
+    const studentIds = absentStudents.map(s => s.student_id);
+    
+    // Get student names and guardian phones
+    const { data: students } = await adminClient
+      .from('students')
+      .select('id, first_name, last_name, guardian_phone, school:schools(name)')
+      .in('id', studentIds);
+
+    if (students) {
+      for (const student of students) {
+        if (student.guardian_phone) {
+          const dateStr = new Date(records[0].date).toLocaleDateString('fr-FR');
+          const message = `Edusphère: ${student.first_name} ${student.last_name} est marqué ABSENT ce jour (${dateStr}). Veuillez contacter l'école pour plus d'infos.`;
+          
+          await smsService.send({
+            to: formatGuineanPhone(student.guardian_phone),
+            message: message
+          });
+        }
+      }
+    }
+  }
+
   revalidatePath('/school-admin/attendance');
   return null;
 }
@@ -349,6 +480,7 @@ export async function createTeacher(input: {
   phone?: string;
   email?: string;
   specialty?: string;
+  password?: string;
 }): Promise<string | null> {
   const schoolId = await getSchoolId();
   const { error } = await adminClient
@@ -357,6 +489,16 @@ export async function createTeacher(input: {
   
   if (error) return error.message;
   revalidatePath('/school-admin/teachers');
+  return null;
+}
+
+export async function updateTeacherPassword(id: string, password: string): Promise<string | null> {
+  const { error } = await adminClient
+    .from('teachers')
+    .update({ password })
+    .eq('id', id);
+  
+  if (error) return error.message;
   return null;
 }
 
@@ -413,8 +555,6 @@ export async function deleteExpense(id: string): Promise<string | null> {
 }
 
 // ─── SMS ──────────────────────────────────────────────────────────────────────
-
-import { smsService, formatGuineanPhone } from '@/lib/sms';
 
 export async function sendSMSNotification(studentId: string, message: string): Promise<{ success: boolean; error?: string }> {
   const { data: student } = await adminClient
