@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { adminClient } from '@/lib/supabase/admin';
+import { adminClient, inviteSchoolAdmin } from '@/lib/supabase/admin';
 import type { CreateSchoolInput } from '@/components/super-admin/CreateSchoolForm';
 import type { School } from '@/components/super-admin/SchoolsPage';
 
@@ -74,19 +74,15 @@ export async function createSchool(input: CreateSchoolInput): Promise<string | n
 
   if (schoolErr) return schoolErr.message;
 
-  // 2. Create admin user with school_admin claim
-  const { data: authData, error: authErr } = await adminClient.auth.admin.createUser({
-    email: input.adminEmail,
-    password: input.adminPassword,
-    email_confirm: true,
-    user_metadata: { full_name: input.adminName },
-    app_metadata: { school_admin: true },
-  });
-
-  if (authErr) {
+  // 2. Invite admin user with Supabase auth invite flow
+  let authData;
+  try {
+    authData = await inviteSchoolAdmin(input.adminEmail, input.name);
+  } catch (err: any) {
     await adminClient.from('schools').delete().eq('id', school.id);
-    return authErr.message;
+    return err.message;
   }
+
 
   // 3. Link admin to school
   const { error: linkErr } = await adminClient.from('school_admins').insert({
