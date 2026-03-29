@@ -3,11 +3,20 @@ import Link from 'next/link';
 const columns = [
   {
     title: 'Produit',
-    links: ['Fonctionnalités', 'Tarifs', 'Sécurité', 'Roadmap'],
+    links: [
+      { label: 'Fonctionnalités', href: '/features' },
+      { label: 'Tarifs',          href: '/pricing'  },
+      { label: 'Sécurité',        href: '/security' },
+      { label: 'Roadmap',         href: '/roadmap'  },
+    ],
   },
   {
     title: 'Légal',
-    links: ['Mentions légales', 'Politique de confidentialité', 'CGU'],
+    links: [
+      { label: 'Mentions légales',            href: '/legal/mentions'     },
+      { label: 'Politique de confidentialité', href: '/legal/privacy'      },
+      { label: 'CGU',                          href: '/legal/cgu'          },
+    ],
   },
 ];
 
@@ -76,12 +85,12 @@ export default function Footer() {
               </h4>
               <ul className="space-y-3">
                 {col.links.map((link) => (
-                  <li key={link}>
+                  <li key={link.label}>
                     <Link
-                      href="#"
+                      href={link.href}
                       className="font-[var(--font-dm-sans)] text-sm text-[#6B7A99] hover:text-[#F0F4FF] transition-colors"
                     >
-                      {link}
+                      {link.label}
                     </Link>
                   </li>
                 ))}
